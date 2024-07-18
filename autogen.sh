@@ -33,7 +33,7 @@ echo "  com.grimpirate.App" >> $SCRIPT
 chmod 0755 *.sh
 $DIR/build.sh
 
-jlink --no-header-files --no-man-pages --compress=zip-9 --add-modules java.desktop --output "jre"
+$JAVA_HOME/bin/jlink --no-header-files --no-man-pages --compress=zip-9 --add-modules java.desktop --output "jre"
 
 rm jre/release
 rm -rf jre/legal
