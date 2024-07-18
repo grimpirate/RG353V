@@ -46,7 +46,7 @@ public class JoystickEventRunnable implements Runnable
 		final long _time = Integer.toUnsignedLong(time);
 		final int _type = Byte.toUnsignedInt(type);
 		final int _number = Byte.toUnsignedInt(number);
-		final JoystickEvent newValue = new JoystickEvent(_time, JoystickEventMapping.valueOf(_number, JoystickEventValue.valueOf(value, JoystickEventType.valueOf(_type))), this);
+		final JoystickEvent newValue = new JoystickEvent(_time, JoystickEventMapping.valueOf(_number, JoystickEventValue.valueOf(value, JoystickEventType.valueOf(_type))));
 		support.firePropertyChange("JoystickEvent", oldValue, newValue);
 		oldValue = newValue;
 	}

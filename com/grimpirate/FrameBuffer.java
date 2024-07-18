@@ -14,8 +14,6 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.UUID;
 
-import javax.imageio.ImageIO;
-
 public class FrameBuffer
 {
 	public static final Path DEVICE_PATH = Paths.get("/dev/fb0");
@@ -66,6 +64,31 @@ public class FrameBuffer
 		}catch(Exception e)
 		{
 			e.printStackTrace();
+			// Default values for ANBERNIC RG353V handheld
+			image = new BufferedImage(new ComponentColorModel(
+					ColorSpace.getInstance(ColorSpace.CS_sRGB),
+					new int[] {
+							8,
+							8,
+							8,
+							8},
+					true, false,
+					Transparency.OPAQUE,
+					DataBuffer.TYPE_BYTE),
+					Raster.createInterleavedRaster(
+							bytes = new DataBufferByte(1228800),
+							640,
+							480,
+							2560,
+							4,
+							new int[] { // BGRA offsets
+									2,
+									1,
+									0,
+									3},
+							null),
+					false,
+					null);
 		}
 	}
 	
@@ -78,7 +101,7 @@ public class FrameBuffer
 		return SingletonHelper.INSTANCE;
 	}
 
-	public final Graphics2D createGraphics()
+	public Graphics2D createGraphics()
 	{
 		final Graphics2D g2d = image.createGraphics();
 		g2d.setClip(0, 0, image.getWidth(), image.getHeight());
@@ -97,11 +120,24 @@ public class FrameBuffer
 		}
 	}
 	
-	public void capture()
+	public static void capture()
 	{
 		try
 		{
-			BufferedImage capture = new BufferedImage(
+			final ProcessBuilder builder = new ProcessBuilder();
+			builder.command("sh", "-c", "fbgrab " + UUID.randomUUID() + ".png");
+			builder.directory(Paths.get("/userdata/roms/anbernic/screenshots").toFile());
+			final Process process = builder.start();
+			process.waitFor();
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		/*
+		try
+		{
+			final BufferedImage capture = new BufferedImage(
 					image.getColorModel(),
 					image.copyData(null),
 					false,
@@ -116,5 +152,11 @@ public class FrameBuffer
 		{
 			e.printStackTrace();
 		}
+		*/
+	}
+	
+	public static void clear()
+	{
+		System.out.print("\033[H\033[J");
 	}
 }

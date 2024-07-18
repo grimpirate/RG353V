@@ -4,27 +4,20 @@ public class JoystickEvent
 {
 	private final long time;
 	private final JoystickEventMapping map;
-	private final JoystickEventRunnable runnable;
 	
-	public JoystickEvent(long time, JoystickEventMapping map, JoystickEventRunnable runnable)
+	public JoystickEvent(long time, JoystickEventMapping map)
 	{
 		this.time = time;
 		this.map = map;
-		this.runnable = runnable;
 	}
 	
-	public final long getTime()
+	public long getTime()
 	{
 		return time;
 	}
 	
-	public final JoystickEventMapping getMap()
+	public JoystickEventMapping getMap()
 	{
 		return map;
-	}
-	
-	public final JoystickEventRunnable getRunnable()
-	{
-		return runnable;
 	}
 }

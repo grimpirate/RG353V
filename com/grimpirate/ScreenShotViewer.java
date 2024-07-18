@@ -4,9 +4,6 @@ import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.io.File;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
@@ -16,83 +13,18 @@ import java.nio.file.Paths;
 
 import javax.imageio.ImageIO;
 
-public class ScreenShotViewer implements PropertyChangeListener
+public class ScreenShotViewer
 {
-	private Path[] screenshots;
-	private int current;
-	private FrameBuffer fb;
-	
-	public ScreenShotViewer() throws Exception
-	{
-		screenshots = Files.list(Paths.get("/userdata/roms/anbernic/screenshots"))
-				.filter(path -> !Files.isDirectory(path) && path.toString().endsWith(".png"))
-				.toArray(Path[]::new);
-		current = 0;
-		fb = FrameBuffer.getInstance();
-		new JoystickExecutor(this);
-	}
-
 	static
 	{
 		tty();
 	}
-
-	@Override
-	public void propertyChange(PropertyChangeEvent evt)
-	{
-		JoystickEvent event = (JoystickEvent) evt.getNewValue();
-		JoystickEventMapping map = event.getMap();
-		if(map == JoystickEventMapping.FUNCTION && map.getValue() == JoystickEventValue.PRESSED)
-			event.getRunnable().systemHalt();
-		if(
-				map == JoystickEventMapping.LEFT && map.getValue() == JoystickEventValue.PRESSED
-				|| map == JoystickEventMapping.SELECT && map.getValue() == JoystickEventValue.PRESSED
-				|| map == JoystickEventMapping.X && map.getValue() == JoystickEventValue.PRESSED
-				|| map == JoystickEventMapping.Y && map.getValue() == JoystickEventValue.PRESSED
-				|| map == JoystickEventMapping.UP && map.getValue() == JoystickEventValue.PRESSED
-				|| map == JoystickEventMapping.L1 && map.getValue() == JoystickEventValue.PRESSED
-				|| map == JoystickEventMapping.L2 && map.getValue() == JoystickEventValue.PRESSED
-				|| map == JoystickEventMapping.LEFT_X_AXIS && map.getValue().getValue() < 0
-				|| map == JoystickEventMapping.RIGHT_X_AXIS && map.getValue().getValue() < 0
-				|| map == JoystickEventMapping.LEFT_Y_AXIS && map.getValue().getValue() < 0
-				|| map == JoystickEventMapping.RIGHT_Y_AXIS && map.getValue().getValue() < 0
-				)
-		{
-			if(screenshots.length > 0)
-				drawImage(fb, screenshots[current = current == 0 ? screenshots.length - 1 : current - 1]);
-		}
-		if(
-				map == JoystickEventMapping.RIGHT && map.getValue() == JoystickEventValue.PRESSED
-				|| map == JoystickEventMapping.START && map.getValue() == JoystickEventValue.PRESSED
-				|| map == JoystickEventMapping.B && map.getValue() == JoystickEventValue.PRESSED
-				|| map == JoystickEventMapping.A && map.getValue() == JoystickEventValue.PRESSED
-				|| map == JoystickEventMapping.DOWN && map.getValue() == JoystickEventValue.PRESSED
-				|| map == JoystickEventMapping.R1 && map.getValue() == JoystickEventValue.PRESSED
-				|| map == JoystickEventMapping.R2 && map.getValue() == JoystickEventValue.PRESSED
-				|| map == JoystickEventMapping.LEFT_X_AXIS && map.getValue().getValue() > 0
-				|| map == JoystickEventMapping.RIGHT_X_AXIS && map.getValue().getValue() > 0
-				|| map == JoystickEventMapping.LEFT_Y_AXIS && map.getValue().getValue() > 0
-				|| map == JoystickEventMapping.RIGHT_Y_AXIS && map.getValue().getValue() > 0
-				)
-		{
-			if(screenshots.length > 0)
-				drawImage(fb, screenshots[current = current == screenshots.length - 1 ? 0 : current + 1]);
-		}
-	}
-
-	public static void main(String[] args) throws Exception
-	{
-		new ScreenShotViewer();
-		System.exit(0);
-	}
-
+	
 	public static void tty()
 	{
 		try
 		{
-			final File file = Paths.get("/dev/tty0").toFile();
-			final FileOutputStream output = new FileOutputStream(file);
-			final PrintStream stream = new PrintStream(output, true, StandardCharsets.UTF_8);
+			final PrintStream stream = new PrintStream(new FileOutputStream(Paths.get("/dev/tty0").toFile()), true, StandardCharsets.UTF_8);
 			System.setOut(stream);
 			System.setErr(stream);
 		}
@@ -101,12 +33,68 @@ public class ScreenShotViewer implements PropertyChangeListener
 			e.printStackTrace();
 		}
 	}
-
-	public static void clear()
+	
+	public static void main(String[] args) throws Exception
 	{
-		System.out.print("\033\143");
+		new ScreenShotViewer();
+		System.exit(0);
 	}
 	
+	private int current = 0;
+	
+	public ScreenShotViewer() throws Exception
+	{
+		Path[] screenshots = Files.list(Paths.get("/userdata/roms/anbernic/screenshots"))
+				.filter(path -> !Files.isDirectory(path) && path.toString().endsWith(".png"))
+				.toArray(Path[]::new);
+		FrameBuffer fb = FrameBuffer.getInstance();
+		new JoystickExecutor() {
+
+			@Override
+			public void onInput(JoystickEvent event, JoystickEventRunnable queue)
+			{
+				JoystickEventMapping map = event.getMap();
+				if(map == JoystickEventMapping.FUNCTION && map.getValue() == JoystickEventValue.PRESSED)
+					queue.systemHalt();
+				if(
+						map == JoystickEventMapping.LEFT && map.getValue() == JoystickEventValue.PRESSED
+						|| map == JoystickEventMapping.SELECT && map.getValue() == JoystickEventValue.PRESSED
+						|| map == JoystickEventMapping.X && map.getValue() == JoystickEventValue.PRESSED
+						|| map == JoystickEventMapping.Y && map.getValue() == JoystickEventValue.PRESSED
+						|| map == JoystickEventMapping.UP && map.getValue() == JoystickEventValue.PRESSED
+						|| map == JoystickEventMapping.L1 && map.getValue() == JoystickEventValue.PRESSED
+						|| map == JoystickEventMapping.L2 && map.getValue() == JoystickEventValue.PRESSED
+						|| map == JoystickEventMapping.LEFT_X_AXIS && map.getValue().getValue() < 0
+						|| map == JoystickEventMapping.RIGHT_X_AXIS && map.getValue().getValue() < 0
+						|| map == JoystickEventMapping.LEFT_Y_AXIS && map.getValue().getValue() < 0
+						|| map == JoystickEventMapping.RIGHT_Y_AXIS && map.getValue().getValue() < 0
+						)
+				{
+					if(screenshots.length > 0)
+						drawImage(fb, screenshots[current = current == 0 ? screenshots.length - 1 : current - 1]);
+				}
+				if(
+						map == JoystickEventMapping.RIGHT && map.getValue() == JoystickEventValue.PRESSED
+						|| map == JoystickEventMapping.START && map.getValue() == JoystickEventValue.PRESSED
+						|| map == JoystickEventMapping.B && map.getValue() == JoystickEventValue.PRESSED
+						|| map == JoystickEventMapping.A && map.getValue() == JoystickEventValue.PRESSED
+						|| map == JoystickEventMapping.DOWN && map.getValue() == JoystickEventValue.PRESSED
+						|| map == JoystickEventMapping.R1 && map.getValue() == JoystickEventValue.PRESSED
+						|| map == JoystickEventMapping.R2 && map.getValue() == JoystickEventValue.PRESSED
+						|| map == JoystickEventMapping.LEFT_X_AXIS && map.getValue().getValue() > 0
+						|| map == JoystickEventMapping.RIGHT_X_AXIS && map.getValue().getValue() > 0
+						|| map == JoystickEventMapping.LEFT_Y_AXIS && map.getValue().getValue() > 0
+						|| map == JoystickEventMapping.RIGHT_Y_AXIS && map.getValue().getValue() > 0
+						)
+				{
+					if(screenshots.length > 0)
+						drawImage(fb, screenshots[current = current == screenshots.length - 1 ? 0 : current + 1]);
+				}
+			}
+
+		};
+	}
+
 	public static void drawImage(FrameBuffer buffer, Path path)
 	{
 		try
