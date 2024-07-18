@@ -57,8 +57,7 @@ public class JoystickEventRunnable implements Runnable
 			{
 				channel.read(buffer);
 				buffer.flip();
-				for(int i = 0; i < buffer.remaining() / 8; i++)
-					notifyObservers(buffer.getInt(), buffer.getShort(), buffer.get(), buffer.get());
+				notifyObservers(buffer.getInt(), buffer.getShort(), buffer.get(), buffer.get());
 				buffer.clear();
 			}
 		} catch (IOException e) {
