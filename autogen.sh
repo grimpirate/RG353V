@@ -21,7 +21,7 @@ SCRIPT=Java.sh
 echo "#!/bin/sh" > $SCRIPT
 echo "" >> $SCRIPT
 echo "DIR=\"\$(dirname \"\$(readlink -f \"\${0}\")\")\"" >> $SCRIPT
-echo "export JAVA_HOME=\$DIR/$JAVA_HOME" >> $SCRIPT
+echo "export JAVA_HOME=\$DIR/jre" >> $SCRIPT
 echo "export JSD_PIXMAPS=shared" >> $SCRIPT
 echo "\$JAVA_HOME/bin/java \\" >> $SCRIPT
 echo "  -Djava.awt.headless=true \\" >> $SCRIPT
