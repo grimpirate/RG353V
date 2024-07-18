@@ -5,7 +5,7 @@ wget https://corretto.aws/downloads/latest/amazon-corretto-22-aarch64-linux-jdk.
 gzip -dk amazon-corretto-22-aarch64-linux-jdk.tar.gz
 tar -xvf amazon-corretto-22-aarch64-linux-jdk.tar
 
-JAVA_HOME="$(ls | grep amazon)"
+JAVA_HOME="$(ls | grep linux-aarch64)"
 
 SCRIPT=build.sh
 echo "#!/bin/sh" > $SCRIPT
@@ -15,7 +15,6 @@ echo "export JAVA_HOME=\$DIR/$JAVA_HOME" >> $SCRIPT
 echo "\$JAVA_HOME/bin/javac \\" >> $SCRIPT
 echo "  -cp \$DIR \\" >> $SCRIPT
 echo "  com/grimpirate/App.java" >> $SCRIPT
-echo "rm \$DIR/com/grimpirate/*.java" >> $SCRIPT
 
 SCRIPT=Java.sh
 echo "#!/bin/sh" > $SCRIPT
@@ -35,6 +34,7 @@ $DIR/build.sh
 
 $JAVA_HOME/bin/jlink --no-header-files --no-man-pages --compress=zip-9 --add-modules java.desktop --output "jre"
 
+rm com/grimpirate/*.java
 rm jre/release
 rm -rf jre/legal
 rm jre/bin/keytool
