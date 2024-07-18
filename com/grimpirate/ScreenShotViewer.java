@@ -28,7 +28,7 @@ public class ScreenShotViewer implements PropertyChangeListener
 				.filter(path -> !Files.isDirectory(path) && path.toString().endsWith(".png"))
 				.toArray(Path[]::new);
 		current = 0;
-		fb = new FrameBuffer();
+		fb = FrameBuffer.getInstance();
 		new JoystickExecutor(this);
 	}
 

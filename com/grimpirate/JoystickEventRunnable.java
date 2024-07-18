@@ -17,9 +17,18 @@ public class JoystickEventRunnable implements Runnable
 	
 	private PropertyChangeSupport support;
 	
-	public JoystickEventRunnable()
+	private JoystickEventRunnable()
 	{
 		support = new PropertyChangeSupport(this);
+	}
+	
+	private static class SingletonHelper {
+		private static final JoystickEventRunnable INSTANCE = new JoystickEventRunnable();
+	}
+	
+	public static JoystickEventRunnable getInstance()
+	{
+		return SingletonHelper.INSTANCE;
 	}
 	
 	public void addPropertyChangeListener(PropertyChangeListener listener)
@@ -58,7 +67,7 @@ public class JoystickEventRunnable implements Runnable
 				channel.read(buffer);
 				buffer.flip();
 				notifyObservers(buffer.getInt(), buffer.getShort(), buffer.get(), buffer.get());
-				buffer.clear();
+				buffer.rewind();
 			}
 		} catch (IOException e) {
 			e.printStackTrace();

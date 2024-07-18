@@ -10,7 +10,7 @@ class JoystickExecutor
 {	
 	public JoystickExecutor(PropertyChangeListener listener)
 	{
-		JoystickEventRunnable queue = new JoystickEventRunnable();
+		JoystickEventRunnable queue = JoystickEventRunnable.getInstance();
 		queue.addPropertyChangeListener(listener);
 		final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 		final ScheduledFuture<?> future = executor.schedule(queue, 0, TimeUnit.SECONDS);
