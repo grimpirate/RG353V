@@ -3,39 +3,10 @@ package com.grimpirate;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
-import java.io.FileOutputStream;
-import java.io.PrintStream;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Paths;
 
-public class App
+public class App extends RG353V
 {	
-	static
-	{
-		tty();
-	}
-	
-	public static void tty()
-	{
-		try
-		{
-			final PrintStream stream = new PrintStream(new FileOutputStream(Paths.get("/dev/tty0").toFile()), true, StandardCharsets.UTF_8);
-			System.setOut(stream);
-			System.setErr(stream);
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-		}
-	}
-	
 	public static void main(String[] args)
-	{
-		new App();
-		System.exit(0);
-	}
-
-	public App()
 	{
 		new JoystickExecutor(){
 			@Override
@@ -56,6 +27,7 @@ public class App
 					FrameBuffer.capture();
 			}
 		};
+		System.exit(0);
 	}
 
 	public static void drawRainbow()

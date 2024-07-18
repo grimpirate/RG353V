@@ -4,50 +4,27 @@ import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
-import java.io.FileOutputStream;
-import java.io.PrintStream;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import javax.imageio.ImageIO;
 
-public class ScreenShotViewer
-{
-	static
-	{
-		tty();
-	}
-	
-	public static void tty()
+public class ScreenShotViewer extends RG353V
+{	
+	public static void main(String[] args) throws Exception
 	{
 		try
 		{
-			final PrintStream stream = new PrintStream(new FileOutputStream(Paths.get("/dev/tty0").toFile()), true, StandardCharsets.UTF_8);
-			System.setOut(stream);
-			System.setErr(stream);
+			screenshots = Files.list(Paths.get("/userdata/roms/anbernic/screenshots"))
+					.filter(path -> !Files.isDirectory(path) && path.toString().endsWith(".png"))
+					.toArray(Path[]::new);
 		}
 		catch(Exception e)
 		{
 			e.printStackTrace();
 		}
-	}
-	
-	public static void main(String[] args) throws Exception
-	{
-		new ScreenShotViewer();
-		System.exit(0);
-	}
-	
-	private int current = 0;
-	
-	public ScreenShotViewer() throws Exception
-	{
-		Path[] screenshots = Files.list(Paths.get("/userdata/roms/anbernic/screenshots"))
-				.filter(path -> !Files.isDirectory(path) && path.toString().endsWith(".png"))
-				.toArray(Path[]::new);
-		FrameBuffer fb = FrameBuffer.getInstance();
+		final FrameBuffer fb = FrameBuffer.getInstance();
 		new JoystickExecutor() {
 
 			@Override
@@ -93,7 +70,11 @@ public class ScreenShotViewer
 			}
 
 		};
+		System.exit(0);
 	}
+
+	static int current = 0;
+	static Path[] screenshots = new Path[0];
 
 	public static void drawImage(FrameBuffer buffer, Path path)
 	{
