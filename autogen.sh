@@ -4,7 +4,6 @@ DIR="$(dirname "$(readlink -f "${0}")")"
 wget https://corretto.aws/downloads/latest/amazon-corretto-22-aarch64-linux-jdk.tar.gz
 gzip -dk amazon-corretto-22-aarch64-linux-jdk.tar.gz
 tar -xvf amazon-corretto-22-aarch64-linux-jdk.tar
-rm amazon-corretto-22-aarch64-linux-jdk.tar*
 
 JAVA_HOME="$(ls | grep amazon)"
 
@@ -33,5 +32,15 @@ echo "  com.grimpirate.App" >> $SCRIPT
 
 chmod 0755 *.sh
 $DIR/build.sh
+
+jlink --no-header-files --no-man-pages --compress=zip-9 --add-modules java.desktop --output "jre"
+
+rm jre/release
+rm -rf jre/legal
+rm jre/bin/keytool
+rm -rf $JAVA_HOME
+rm amazon-corretto-22-aarch64-linux-jdk.tar*
 rm build.sh
 rm autogen.sh
+rm README.md
+rm LICENSE
