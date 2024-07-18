@@ -30,7 +30,10 @@ public class App implements PropertyChangeListener
 		JoystickEventMapping map = event.getMap();
 		System.out.println(map + ": " + (map.getValue() == JoystickEventValue.AXIS ? map.getValue().getValue() : map.getValue()));
 		if(map == JoystickEventMapping.SELECT && map.getValue() == JoystickEventValue.PRESSED)
+		{
 			event.getRunnable().systemHalt();
+			clear();
+		}
 		if(map == JoystickEventMapping.START && map.getValue() == JoystickEventValue.PRESSED)
 			clear();
 		if(map == JoystickEventMapping.FUNCTION && map.getValue() == JoystickEventValue.PRESSED)
