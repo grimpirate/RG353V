@@ -1,7 +1,7 @@
 #!/bin/sh
 
 DIR="$(dirname "$(readlink -f "${0}")")"
-wget https://corretto.aws/downloads/latest/amazon-corretto-22-aarch64-linux-jd>
+wget https://corretto.aws/downloads/latest/amazon-corretto-22-aarch64-linux-jdk.tar.gz
 gzip -dk amazon-corretto-22-aarch64-linux-jdk.tar.gz
 tar -xvf amazon-corretto-22-aarch64-linux-jdk.tar
 rm amazon-corretto-22-aarch64-linux-jdk.tar*
