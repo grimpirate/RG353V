@@ -1,5 +1,3 @@
-# RG353V
-Library that interfaces directly with /dev/fb0 and dev/input/js0 for creating Java apps on the RG353V with stock OS
 ## Install
 ssh into RG353V
 ```
