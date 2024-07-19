@@ -4,19 +4,17 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 
-import com.grimpirate.application.RG353V;
+import com.grimpirate.application.Skeleton;
 import com.grimpirate.display.FrameBuffer;
 import com.grimpirate.input.JoystickEvent;
-import com.grimpirate.input.JoystickQueue;
 import com.grimpirate.input.enums.JoystickInput;
 import com.grimpirate.input.enums.JoystickValue;
 
-public class App extends RG353V
+public class App extends Skeleton
 {	
 	public static void main(String[] args)
 	{
 		new App();
-		System.exit(0);
 	}
 	
 	public App()
@@ -30,10 +28,7 @@ public class App extends RG353V
 		final JoystickInput map = event.getMap();
 		System.out.println(map + ": " + (map.getValue() == JoystickValue.AXIS ? map.getValue().getValue() : map.getValue()));
 		if(map == JoystickInput.SELECT && map.getValue() == JoystickValue.PRESSED)
-		{
-			JoystickQueue.getInstance().systemHalt();
-			FrameBuffer.clear();
-		}
+			exit();
 		if(map == JoystickInput.START && map.getValue() == JoystickValue.PRESSED)
 			FrameBuffer.clear();
 		if(map == JoystickInput.FUNCTION && map.getValue() == JoystickValue.PRESSED)
@@ -59,7 +54,10 @@ public class App extends RG353V
 				g2d.fillRect(j, i, offset, offset);
 			}
 		}
-		g2d.dispose();
 		buffer.flush();
+		g2d.setColor(Color.RED);
+		g2d.fillRect(dimensions.width / 4, dimensions.height / 4, dimensions.width / 2, dimensions.height / 2);
+		buffer.flush(dimensions.width / 4, dimensions.height / 4, dimensions.width / 2, dimensions.height / 2);
+		g2d.dispose();
 	}
 }

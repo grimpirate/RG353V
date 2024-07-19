@@ -8,7 +8,8 @@ import java.awt.image.ComponentColorModel;
 import java.awt.image.DataBuffer;
 import java.awt.image.DataBufferByte;
 import java.awt.image.Raster;
-import java.nio.file.Files;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
@@ -16,86 +17,60 @@ import java.util.UUID;
 
 public class FrameBuffer
 {
-	public static final Path DEVICE_PATH = Paths.get("/dev/fb0");
-	public static final Path BPP_PATH = Paths.get("/sys/class/graphics/fb0/bits_per_pixel");
-	public static final Path STRIDE_PATH = Paths.get("/sys/class/graphics/fb0/stride");
-	public static final Path SIZE_PATH = Paths.get("/sys/class/graphics/fb0/virtual_size");
+	private enum Device {
+		RG353V;
+	}
 	
+	public static final Path DEVICE_PATH = Paths.get("/dev/fb0");
+
 	private DataBufferByte bytes;
 	private BufferedImage image;
+	private int STRIDE;
+	private int BYTES_PER_PIXEL;
+	private FileChannel channel;
 
 	private FrameBuffer()
 	{
 		try
 		{
-			final int BITS_PER_PIXEL = Integer.parseInt(Files.readString(BPP_PATH).trim(), 10);
-			final int STRIDE = Integer.parseInt(Files.readString(STRIDE_PATH).trim(), 10);
-			final String size = Files.readString(SIZE_PATH).trim();
-			final int offset = size.indexOf(",");
-			final int WIDTH = Integer.parseInt(size.substring(0, offset));
-			final int HEIGHT = Integer.parseInt(size.substring(offset + 1));
-			final int BITS_PER_CHANNEL = BITS_PER_PIXEL >> 2; // Division by 4, # of channels BGRA
-			final int BYTES_PER_PIXEL = BITS_PER_PIXEL >> 3; // Divide by 8, # of bits in a byte
-
-			image = new BufferedImage(new ComponentColorModel(
-					ColorSpace.getInstance(ColorSpace.CS_sRGB),
-					new int[] {
-							BITS_PER_CHANNEL,
-							BITS_PER_CHANNEL,
-							BITS_PER_CHANNEL,
-							BITS_PER_CHANNEL},
-					true, false,
-					Transparency.OPAQUE,
-					DataBuffer.TYPE_BYTE),
-					Raster.createInterleavedRaster(
-							bytes = new DataBufferByte(STRIDE * HEIGHT),
-							WIDTH,
-							HEIGHT,
-							STRIDE,
-							BYTES_PER_PIXEL,
-							new int[] { // BGRA offsets
-									2,
-									1,
-									0,
-									3},
-							null),
-					false,
-					null);
+			channel = FileChannel.open(DEVICE_PATH, StandardOpenOption.WRITE);
 		}catch(Exception e)
 		{
 			e.printStackTrace();
-			// Default values for ANBERNIC RG353V handheld
+			System.exit(1);
+		}
+
+		switch(Device.valueOf(System.getProperty("com.grimpirate.device")))
+		{
+		default:
+			// Default values for ANBERNIC RG353V
+			STRIDE = 2560;
+			BYTES_PER_PIXEL = 4;
 			image = new BufferedImage(new ComponentColorModel(
 					ColorSpace.getInstance(ColorSpace.CS_sRGB),
-					new int[] {
-							8,
-							8,
-							8,
-							8},
-					true, false,
+					new int[] {8,8,8,8},	// Bits per channel
+					true,
+					false,
 					Transparency.OPAQUE,
 					DataBuffer.TYPE_BYTE),
 					Raster.createInterleavedRaster(
 							bytes = new DataBufferByte(1228800),
 							640,
 							480,
-							2560,
-							4,
-							new int[] { // BGRA offsets
-									2,
-									1,
-									0,
-									3},
+							STRIDE,
+							BYTES_PER_PIXEL,
+							new int[] {2,1,0,3},	// BGRA channel offsets
 							null),
 					false,
 					null);
+			break;
 		}
 	}
-	
+
 	private static class SingletonHelper {
 		private static final FrameBuffer INSTANCE = new FrameBuffer();
 	}
-	
+
 	public static FrameBuffer getInstance()
 	{
 		return SingletonHelper.INSTANCE;
@@ -108,18 +83,34 @@ public class FrameBuffer
 		return g2d;
 	}
 
-	public void flush()
+	public void flush(int x, int y, int width, int height)
 	{
 		try
 		{
-			Files.write(DEVICE_PATH, bytes.getData(), StandardOpenOption.WRITE);
+			int offset = y * STRIDE + x * BYTES_PER_PIXEL;
+			final int stride = width * BYTES_PER_PIXEL;
+			ByteBuffer partialBuffer = ByteBuffer.allocate(stride);
+			for(int i = 0; i < height; i++)
+			{
+				partialBuffer.put(bytes.getData(), offset, stride);
+				partialBuffer.flip();
+				channel.write(partialBuffer, offset);
+				partialBuffer.rewind();
+				offset += STRIDE;
+			}
+			channel.force(false);
 		}
 		catch (Exception e)
 		{
 			e.printStackTrace();
 		}
 	}
-	
+
+	public void flush()
+	{
+		flush(0, 0, image.getWidth(), image.getHeight());
+	}
+
 	public static void capture()
 	{
 		try
@@ -152,9 +143,21 @@ public class FrameBuffer
 		{
 			e.printStackTrace();
 		}
-		*/
+		 */
 	}
-	
+
+	public void close()
+	{
+		try
+		{
+			channel.close();
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+
 	public static void clear()
 	{
 		System.out.print("\033[H\033[J");

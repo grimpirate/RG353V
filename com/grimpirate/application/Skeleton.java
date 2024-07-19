@@ -11,10 +11,11 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
+import com.grimpirate.display.FrameBuffer;
 import com.grimpirate.input.JoystickEvent;
 import com.grimpirate.input.JoystickQueue;
 
-abstract public class RG353V implements PropertyChangeListener
+abstract public class Skeleton implements PropertyChangeListener
 {	
 	static
 	{
@@ -35,7 +36,7 @@ abstract public class RG353V implements PropertyChangeListener
 		}
 	}
 	
-	public RG353V()
+	public Skeleton()
 	{
 		JoystickQueue queue = JoystickQueue.getInstance();
 		queue.addPropertyChangeListener(this);
@@ -58,6 +59,7 @@ abstract public class RG353V implements PropertyChangeListener
 	public void exit()
 	{
 		JoystickQueue.getInstance().systemHalt();
+		FrameBuffer.getInstance().close();
 		System.exit(0);
 	}
 }

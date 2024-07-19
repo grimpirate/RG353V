@@ -10,14 +10,13 @@ import java.nio.file.Paths;
 
 import javax.imageio.ImageIO;
 
-import com.grimpirate.application.RG353V;
+import com.grimpirate.application.Skeleton;
 import com.grimpirate.display.FrameBuffer;
 import com.grimpirate.input.JoystickEvent;
-import com.grimpirate.input.JoystickQueue;
 import com.grimpirate.input.enums.JoystickInput;
 import com.grimpirate.input.enums.JoystickValue;
 
-public class ScreenShotViewer extends RG353V
+public class ScreenShotViewer extends Skeleton
 {	
 	public static void main(String[] args) throws Exception
 	{
@@ -32,7 +31,6 @@ public class ScreenShotViewer extends RG353V
 			e.printStackTrace();
 		}
 		new ScreenShotViewer();
-		System.exit(0);
 	}
 	
 	private int current = 0;
@@ -43,7 +41,7 @@ public class ScreenShotViewer extends RG353V
 	{
 		JoystickInput map = event.getMap();
 		if(map == JoystickInput.FUNCTION && map.getValue() == JoystickValue.PRESSED)
-			JoystickQueue.getInstance().systemHalt();
+			exit();
 		if(
 				map == JoystickInput.LEFT && map.getValue() == JoystickValue.PRESSED
 				|| map == JoystickInput.SELECT && map.getValue() == JoystickValue.PRESSED
@@ -92,7 +90,7 @@ public class ScreenShotViewer extends RG353V
 			double scale = h < v ? h : v;
 			g2d.drawImage(image, AffineTransform.getScaleInstance(scale, scale), null);
 			g2d.dispose();
-			buffer.flush();
+			buffer.flush(0, 0, image.getWidth(), image.getHeight());
 		}
 		catch(Exception e)
 		{

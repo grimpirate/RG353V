@@ -10,6 +10,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 
+import com.grimpirate.display.FrameBuffer;
+
 public class JoystickQueue implements Runnable
 {
 	private boolean poll = true;
@@ -50,7 +52,14 @@ public class JoystickQueue implements Runnable
 	
 	public void systemHalt()
 	{
+		systemHalt(true);
+	}
+	
+	public void systemHalt(boolean clear)
+	{
 		poll = false;
+		if(clear)
+			FrameBuffer.clear();
 	}
 	
 	@Override
@@ -68,6 +77,7 @@ public class JoystickQueue implements Runnable
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
+			System.exit(2);
 		}
 	}
 }
