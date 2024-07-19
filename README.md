@@ -1,12 +1,14 @@
 ## Install
 ssh into RG353V
 ```
-cd /userdata/roms/ports
+cd /userdata
 wget https://github.com/grimpirate/RG353V/archive/refs/heads/main.zip
 unzip main.zip
 cd RG353V-main
 chmod 0755 autogen.sh
 ./autogen.sh
+cd ..
+mv RG353-main /userdata/roms/ports
 ```
 Restart device  
 PORTS emulator should now have a listing that reads Java\[ports\]
