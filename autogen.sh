@@ -26,6 +26,7 @@ echo "\$JAVA_HOME/bin/java \\" >> $SCRIPT
 echo "  -Djava.awt.headless=true \\" >> $SCRIPT
 echo "  -Dsun.java2d.opengl=true \\" >> $SCRIPT
 echo "  -Dsun.java2d.pmoffscreen=true \\" >> $SCRIPT
+echo "  -Dcom.grimpirate.device=RG353V \\" >> $SCRIPT
 echo "  -cp \$DIR \\" >> $SCRIPT
 echo "  com.grimpirate.App" >> $SCRIPT
 
