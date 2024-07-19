@@ -1,4 +1,4 @@
-package com.grimpirate;
+package com.grimpirate.input;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
@@ -10,23 +10,23 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 
-public class JoystickEventRunnable implements Runnable
+public class JoystickQueue implements Runnable
 {
 	private boolean poll = true;
 	private JoystickEvent oldValue;
 	
 	private PropertyChangeSupport support;
 	
-	private JoystickEventRunnable()
+	private JoystickQueue()
 	{
 		support = new PropertyChangeSupport(this);
 	}
 	
 	private static class SingletonHelper {
-		private static final JoystickEventRunnable INSTANCE = new JoystickEventRunnable();
+		private static final JoystickQueue INSTANCE = new JoystickQueue();
 	}
 	
-	public static JoystickEventRunnable getInstance()
+	public static JoystickQueue getInstance()
 	{
 		return SingletonHelper.INSTANCE;
 	}
@@ -43,10 +43,7 @@ public class JoystickEventRunnable implements Runnable
 	
 	public void notifyObservers(int time, short value, byte type, byte number)
 	{
-		final long _time = Integer.toUnsignedLong(time);
-		final int _type = Byte.toUnsignedInt(type);
-		final int _number = Byte.toUnsignedInt(number);
-		final JoystickEvent newValue = new JoystickEvent(_time, JoystickEventMapping.valueOf(_number, JoystickEventValue.valueOf(value, JoystickEventType.valueOf(_type))));
+		final JoystickEvent newValue = new JoystickEvent(time, number, value, type);
 		support.firePropertyChange("JoystickEvent", oldValue, newValue);
 		oldValue = newValue;
 	}

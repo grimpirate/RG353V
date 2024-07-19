@@ -1,4 +1,4 @@
-package com.grimpirate;
+package com.grimpirate.display;
 
 import java.awt.Graphics2D;
 import java.awt.Transparency;
