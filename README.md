@@ -8,7 +8,7 @@ cd RG353V-main
 chmod 0755 autogen.sh
 ./autogen.sh
 cd ..
-mv RG353-main /userdata/roms/ports
+mv RG353V-main /userdata/roms/ports
 ```
 Restart device  
 PORTS emulator should now have a listing that reads Java\[ports\]
