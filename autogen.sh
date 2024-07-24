@@ -35,12 +35,6 @@ $DIR/build.sh
 
 $JAVA_HOME/bin/jlink --no-header-files --no-man-pages --compress=zip-9 --add-modules java.desktop --output "jre"
 
-rm com/grimpirate/*.java
-rm jre/release
-rm -rf jre/legal
-rm jre/bin/keytool
-rm -rf amazon-corretto*
-rm build.sh
-rm autogen.sh
-rm README.md
-rm LICENSE
+find com -type f -name *.java -exec rm -f {} \;
+rm -rf jre/legal amazon-corretto*
+rm jre/release jre/bin/keytool build.sh autogen.sh README.md LICENSE
